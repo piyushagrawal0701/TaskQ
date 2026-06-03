@@ -1,0 +1,76 @@
+require("dotenv").config();
+const express = require("express");
+const http = require("http");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const { Server } = require("socket.io");
+
+const projectRouter = require("./routes/projectRoutes");
+const taskRouter = require("./routes/taskRoutes");
+const messageRouter = require("./routes/messageRoutes");
+const userRouter = require("./routes/userRoutes");
+
+const app = express();
+const server = http.createServer(app);
+
+// Middleware
+app.use(cors({
+  origin: "*", 
+  credentials: true
+}));
+app.use(express.json());
+
+// Database Connection
+mongoose.connect(process.env.MONGODB_URI)
+    .then(() => console.log("Database Connected"))
+    .catch((error) => console.log("Database Error:", error.message));
+
+// Socket.IO Setup for Real-Time Core
+const io = new Server(server, {
+  cors: {
+    origin: "*", // Adjust to specific frontend URI during production build shifts
+    methods: ["GET", "POST"],
+  },
+});
+io.on("connection", (socket) => {
+
+  socket.on("join-team", (room) => {
+    socket.join(room);
+  });
+
+ socket.on("send-message", (data) => {
+
+  io.emit("receive-message", data);
+});
+  socket.on("task-change", () => {
+    io.emit("task-updated");
+  });
+
+  socket.on("disconnect", () => {
+  });
+});
+
+// Basic Base Route
+app.get("/", (req, res) => {
+  res.send("API is running...");
+});
+
+// Secured API Route Mounts
+app.use('/api/projects', projectRouter);
+app.use('/api/tasks', taskRouter);
+app.use('/api/messages', messageRouter);
+app.use('/api/users', userRouter);
+
+
+// 🔍 PLACE THIS AT THE VERY BOTTOM OF YOUR server.js (Just above server.listen)
+// app.use((req, res) => {
+//   console.log(`⚠️ UNHANDLED FRONTEND REQUEST: ${req.method} ${req.url}`);
+//   res.status(404).json({ 
+//     error: "Route mismatch", 
+//     message: `The server received a ${req.method} request at ${req.url}, but no route handler is built for it.` 
+//   });
+// });
+
+
+const PORT = process.env.PORT || 5050;
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
