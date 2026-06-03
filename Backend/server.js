@@ -14,10 +14,15 @@ const app = express();
 const server = http.createServer(app);
 
 // Middleware
-app.use(cors({
-  origin: "*", 
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://taskq777.netlify.app",
+    ],
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 // Database Connection
@@ -28,7 +33,10 @@ mongoose.connect(process.env.MONGODB_URI)
 // Socket.IO Setup for Real-Time Core
 const io = new Server(server, {
   cors: {
-    origin: "*", // Adjust to specific frontend URI during production build shifts
+    origin: [
+      "http://localhost:5173",
+      "https://taskq777.netlify.app/",
+    ],
     methods: ["GET", "POST"],
   },
 });
