@@ -35,7 +35,7 @@ const io = new Server(server, {
   cors: {
     origin: [
       "http://localhost:5173",
-      "https://taskq777.netlify.app/",
+      "https://taskq777.netlify.app",
     ],
     methods: ["GET", "POST"],
   },
@@ -68,16 +68,6 @@ app.use('/api/projects', projectRouter);
 app.use('/api/tasks', taskRouter);
 app.use('/api/messages', messageRouter);
 app.use('/api/users', userRouter);
-
-
-// 🔍 PLACE THIS AT THE VERY BOTTOM OF YOUR server.js (Just above server.listen)
-// app.use((req, res) => {
-//   console.log(`⚠️ UNHANDLED FRONTEND REQUEST: ${req.method} ${req.url}`);
-//   res.status(404).json({ 
-//     error: "Route mismatch", 
-//     message: `The server received a ${req.method} request at ${req.url}, but no route handler is built for it.` 
-//   });
-// });
 
 
 const PORT = process.env.PORT || 5050;
