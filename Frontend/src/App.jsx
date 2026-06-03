@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
-import Dashboard from "./pages/Dashboard.jsx";
+import Dashboard from "./Pages/Dashboard.jsx";
 import { Toaster } from "react-hot-toast";
 
 const AuthGate = ({ children }) => {
